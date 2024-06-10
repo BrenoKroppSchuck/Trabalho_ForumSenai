@@ -1,0 +1,473 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Fórum Online</title>
+  <style>
+    /* Reset de estilos */
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    /* Estilos para o corpo do documento */
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f8f9fa;
+      color: #333;
+      line-height: 1.6;
+    }
+
+    /* Estilos para o cabeçalho */
+    header {
+      background-color: #007bff;
+      color: white;
+      padding: 20px;
+      text-align: center;
+      position: relative;
+    }
+
+    header h1 {
+      margin-bottom: 10px;
+    }
+
+    /* Estilos para os botões do cabeçalho */
+    .header-buttons {
+      position: absolute;
+      top: 20px; /* Alteração no posicionamento vertical */
+      right: 20px;
+    }
+
+    .header-buttons button {
+      background-color: transparent;
+      border: 1px solid white;
+      color: white;
+      padding: 10px 20px;
+      margin: 0 10px;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+    }
+
+    .header-buttons button:hover {
+      background-color: rgba(255, 255, 255, 0.2);
+    }
+
+    /* Estilos para o rodapé */
+    footer {
+      background-color: #007bff;
+      color: white;
+      padding: 20px 0;
+      text-align: center;
+    }
+
+    /* Estilos para a lista de posts */
+    .post-list {
+      list-style-type: none;
+      padding: 0;
+      margin-top: 20px;
+    }
+
+    /* Estilos para os posts */
+    .post {
+      background-color: white;
+      border-radius: 10px;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+      padding: 20px;
+      margin-bottom: 20px;
+      position: relative;
+      cursor: pointer;
+      transition: transform 0.3s ease;
+    }
+
+    .post:hover {
+      transform: translateY(-5px);
+    }
+
+    .post h2 {
+      color: #007bff;
+      margin-bottom: 10px;
+    }
+
+    .post p {
+      margin-bottom: 10px;
+    }
+
+    /* Estilos para os botões de ação nos posts */
+    .post-buttons {
+      position: absolute;
+      top: 20px;
+      right: 20px;
+      display: flex;
+      align-items: center;
+    }
+
+    .post-buttons button {
+      background-color: transparent;
+      border: none;
+      color: #007bff;
+      cursor: pointer;
+      transition: color 0.3s ease;
+      margin-left: 5px;
+      font-size: 24px;
+    }
+
+    .post-buttons button.liked {
+      color: red;
+    }
+
+    /* Estilos para o botão "Criar Post" */
+    #toggle-create-post-btn {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      background-color: #007bff;
+      border: none;
+      color: white;
+      padding: 10px 20px;
+      cursor: pointer;
+      border-radius: 5px;
+      transition: background-color 0.3s ease;
+    }
+
+    #toggle-create-post-btn:hover {
+      background-color: #0056b3;
+    }
+
+    /* Estilos para a tela transparente */
+    .overlay {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(0, 0, 0, 0.5);
+      z-index: 999;
+    }
+
+    /* Estilos para o modal de detalhes do post */
+    #post-details-modal {
+      display: none;
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      background-color: white;
+      padding: 30px;
+      border-radius: 10px;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+      z-index: 1000;
+      width: 80%;
+      max-width: 500px;
+    }
+
+    #post-details-modal h2 {
+      margin-bottom: 15px;
+      color: #007bff;
+    }
+
+    #post-details-modal p {
+      margin-bottom: 10px;
+    }
+
+    #post-details-modal .close-button {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      color: #888;
+      cursor: pointer;
+      transition: color 0.3s ease;
+    }
+
+    #post-details-modal .close-button:hover {
+      color: #555;
+    }
+
+    /* Estilos para o formulário de criação de post */
+    .create-post-form {
+      display: none;
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      background-color: #f8f9fa;
+      padding: 30px;
+      border-radius: 10px;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+      z-index: 1000;
+      width: 80%;
+      max-width: 500px;
+    }
+
+    .create-post-form h2 {
+      color: #007bff;
+      margin-bottom: 20px;
+    }
+
+    .create-post-form label {
+      display: block;
+      margin-bottom: 10px;
+      color: #555;
+    }
+
+    .create-post-form input[type="text"],
+    .create-post-form textarea {
+      width: 100%;
+      padding: 12px;
+      margin-bottom: 20px;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+    }
+
+    .create-post-form textarea {
+      resize: vertical;
+      min-height: 100px;
+    }
+
+    .create-post-form button {
+      background-color: #007bff;
+      color: white;
+      border: none;
+      padding: 12px 20px;
+      border-radius: 5px;
+      cursor: pointer;
+      font-size: 16px;
+      transition: background-color 0.3s;
+    }
+
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Fórum Online</h1>
+    <div class="header-buttons">
+      <button onclick="
+window.location.href='/login'">Login</button>
+      <button onclick="window.location.href='/register'">Registrar</button>
+    </div>
+  </header>
+  <main>
+    <h2>Lista de Posts</h2>
+    <ul class="post-list" id="post-list">
+      <!-- Aqui vão os posts gerados dinamicamente -->
+    </ul>
+    <button id="toggle-create-post-btn">Criar Post</button>
+    <div class="overlay" id="overlay"></div>
+    <div id="post-details-modal">
+      <span class="close-button" onclick="closePostDetails()">×</span>
+      <h2 class="post-title"></h2>
+      <p class="post-content"></p>
+      <p class="post-author"></p>
+      <p class="post-created-at"></p>
+      <div class="post-buttons">
+        <button id="like-btn-modal" class="like-btn"></button>
+      </div>
+      <h3>Comentários</h3>
+      <div id="post-comments"></div>
+      <form id="comment-form">
+        <textarea id="comment-content" rows="3" placeholder="Seu comentário..." required></textarea>
+        <button id="submit-comment">🛩️</button>
+      </form>
+    </div>
+    <div class="create-post-form" id="create-post-form">
+      <h2>Criar Novo Post</h2>
+      <form id="new-post-form">
+        <label for="post-title">Título:</label>
+        <input type="text" id="post-title" name="title" required>
+        <label for="post-content">Conteúdo:</label>
+        <textarea id="post-content" name="content" rows="5" required></textarea>
+        <button type="submit">Publicar</button>
+      </form>
+    </div>
+  </main>
+  <footer>
+    <p>Todos os direitos reservados a: Breno Kropp e João Falchetti</p>
+  </footer>
+
+  <script>
+    const posts = [
+      {
+        id: '1',
+        title: 'Post com Curtida',
+        content: 'Este é um exemplo de post que já recebeu curtidas.',
+        author: { name: 'Autor 1', bio: 'Biografia do Autor 1', time: '08:00' },
+        likes: 1,
+        comments: [
+          { author: 'Comentador 1', content: 'Primeiro comentário.', dateTime: '2024-06-06 08:00' },
+          { author: 'Comentador 2', content: 'Segundo comentário.', dateTime: '2024-06-06 08:30' }
+        ],
+        dateTime: '2024-06-06 08:00'
+      },
+      {
+        id: '2',
+        title: 'Post sem Curtida',
+        content: 'Este é um exemplo de post que ainda não recebeu curtidas.',
+        author: { name: 'Autor 2', bio: 'Biografia do Autor 2', time: '09:00' },
+        likes: 20,
+        comments: [],
+        dateTime: '2024-06-06 09:00'
+      },
+      {
+        id: '3',
+        title: 'Post Fictício 1',
+        content: 'Conteúdo do post fictício 1.',
+        author: { name: 'Autor 3', bio: 'Biografia do Autor 3', time: '10:00' },
+        likes: 0,
+        comments: [{ author: 'Comentador 3', content: 'Comentário no post fictício 1.', dateTime: '2024-06-06 10:30' }],
+        dateTime: '2024-06-06 10:00'
+      },
+      {
+        id: '4',
+        title: 'Post Fictício 2',
+        content: 'Conteúdo do post fictício 2.',
+        author: { name: 'Autor 4', bio: 'Biografia do Autor 4', time: '11:00' },
+        likes: 0,
+        comments: [{ author: 'Comentador 4', content: 'Comentário no post fictício 2.', dateTime: '2024-06-06 11:30' }],
+        dateTime: '2024-06-06 11:00'
+      }
+    ];
+
+    function showPostDetails(postId) {
+      const post = posts.find(p => p.id === postId);
+      if (post) {
+        const modal = document.getElementById('post-details-modal');
+        modal.innerHTML = `
+          <span class="close-button" onclick="closePostDetails()">×</span>
+          <h2 class="post-title">${post.title}</h2>
+          <p class="post-content">${post.content}</p>
+          <p class="post-author">Autor: ${post.author.name} (${post.likes} curtidas)</p>
+          <p class="post-created-at">Criado em: ${post.dateTime}</p>
+          <div class="post-buttons">
+            <button id="like-btn-modal" class="like-btn ${post.likes > 0 ? 'liked' : ''}" data-likes="${post.likes}">
+              ${post.likes > 0 ? '❤️' : '🖤'}
+            </button>
+          </div>
+          <h3>Comentários</h3>
+          <div id="post-comments">${post.comments.map(comment => `<div class="comment">${comment.author}: ${comment.content} (${comment.dateTime})</div>`).join('')}</div>
+          <form id="comment-form">
+            <textarea id="comment-content" rows="3" placeholder="Seu comentário..." required></textarea>
+            <button id="submit-comment">🛩️</button>
+          </form>
+        `;
+        modal.style.display = 'block';
+        document.getElementById('overlay').style.display = 'block';
+
+        // Adicionar evento de curtida
+        const likeBtnModal = document.getElementById('like-btn-modal');
+        likeBtnModal.addEventListener('click', function(event) {
+          event.preventDefault();
+          let likes = parseInt(likeBtnModal.getAttribute('data-likes'));
+          const liked = likeBtnModal.classList.contains('liked');
+
+          if (liked) {
+            likes--;
+          } else {
+            likes++;
+          }
+
+          likeBtnModal.setAttribute('data-likes', likes);
+          likeBtnModal.innerHTML = `${liked ? '🖤' : '❤️'}`;
+          likeBtnModal.classList.toggle('liked');
+        });
+
+        // Evento para envio de comentário
+        const commentForm = document.getElementById('comment-form');
+        commentForm.addEventListener('submit', function(event) {
+          event.preventDefault();
+          const commentContent = document.getElementById('comment-content').value;
+          const commentSection = document.getElementById('post-comments');
+          const newComment = document.createElement('div');
+          newComment.classList.add('comment');
+          newComment.textContent = `Você: ${commentContent} (${getCurrentDateTime()})`;
+          commentSection.appendChild(newComment);
+          document.getElementById('comment-content').value = '';
+        });
+      }
+    }
+
+    document.querySelectorAll('.post').forEach(postElement => {
+      postElement.addEventListener('click', function() {
+        const postId = this.getAttribute('data-id');
+        showPostDetails(postId);
+      });
+    });
+
+    function closePostDetails() {
+      document.getElementById('post-details-modal').style.display = 'none';
+      document.getElementById('overlay').style.display = 'none';
+    }
+
+    // Função para obter a data e hora atual formatada
+    function getCurrentDateTime() {
+      const now = new Date();
+      const year = now.getFullYear();
+      const month = (now.getMonth() + 1).toString().padStart(2, '0');
+      const day = now.getDate().toString().padStart(2, '0');
+      const hours = now.getHours().toString().padStart(2, '0');
+      const minutes = now.getMinutes().toString().padStart(2, '0');
+      return `${year}-${month}-${day} ${hours}:${minutes}`;
+    }
+
+    // Exibir formulário de criação de post ao clicar no botão
+    document.getElementById('toggle-create-post-btn').addEventListener('click', function() {
+      document.getElementById('create-post-form').style.display = 'block';
+      document.getElementById('overlay').style.display = 'block';
+    });
+
+    // Enviar novo post
+    document.getElementById('new-post-form').addEventListener('submit', function(event) {
+      event.preventDefault();
+      const title = document.getElementById('post-title').value;
+      const content = document.getElementById('post-content').value;
+      const newPost = {
+        id: (posts.length + 1).toString(),
+        title: title,
+        content: content,
+        author: { name: 'Você', bio: 'Autor do Novo Post' },
+        likes: 0,
+        comments: [],
+        dateTime: getCurrentDateTime()
+      };
+      posts.push(newPost);
+      // Limpar os campos do formulário
+      document.getElementById('post-title').value = '';
+      document.getElementById('post-content').value = '';
+      // Fechar o formulário
+      document.getElementById('create-post-form').style.display = 'none';
+      document.getElementById('overlay').style.display = 'none';
+      // Atualizar a lista de posts
+      updatePostList();
+    });
+
+    // Função para atualizar a lista de posts
+    function updatePostList() {
+      const postList = document.getElementById('post-list');
+      postList.innerHTML = '';
+      posts.forEach(post => {
+        const li = document.createElement('li');
+        li.classList.add('post');
+        li.setAttribute('data-id', post.id);
+        li.innerHTML = `
+          <h2>${post.title}</h2>
+          <div class="post-buttons">
+            <button class="like-btn" data-likes="${post.likes}">${post.likes > 0 ? '❤️' : '🖤'} (${post.likes})</button>
+          </div>
+        `;
+        postList.appendChild(li);
+      });
+      // Adicionar evento de clique aos novos posts
+      document.querySelectorAll('.post').forEach(postElement => {
+        postElement.addEventListener('click', function() {
+          const postId = this.getAttribute('data-id');
+          showPostDetails(postId);
+        });
+      });
+    }
+
+    // Inicializar a lista de posts
+    updatePostList();
+  </script>
+</body>
+</html>
